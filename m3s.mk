@@ -2,11 +2,9 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_small.mk)
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
-$(call inherit-product, vendor/aokp/configs/common.mk)
+$(call inherit-product, vendor/slim/config/common.mk)
 
-$(call inherit-product, vendor/aokp/configs/cdma.mk)
-
-$(call inherit-product, vendor/aokp/configs/themes_common.mk)
+$(call inherit-product, vendor/slim/config/cdma.mk)
 
 $(call inherit-product, build/target/product/full.mk)
 
@@ -98,13 +96,10 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=160
 
-TARGET_BOOTANIMATION_NAME := vertical-320x480
+TARGET_BOOTANIMATION_NAME := 480
 
 TARGET_SCREEN_HEIGHT := 320
 TARGET_SCREEN_WIDTH := 480
-
-PRODUCT_COPY_FILES += \
-vendor/aokp/prebuilt/bootanimation/bootanimation_320_480.zip:system/media/bootanimation.zip
 
 # Permissions
 PRODUCT_COPY_FILES += \
@@ -182,6 +177,7 @@ PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/gps.conf:system/etc/gps.conf \
     device/lge/m3s/configs/egl.cfg:system/lib/egl/egl.cfg \
     device/lge/m3s/configs/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
+    device/lge/m3s/configs/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf \
     device/lge/m3s/configs/OperatorPolicy.xml:system/etc/OperatorPolicy.xml \
     device/lge/m3s/configs/UserPolicy.xml:system/etc/UserPolicy.xml \
     device/lge/m3s/configs/01_qcomm_omx.cfg:system/etc/01_qcomm_omx.cfg \
@@ -255,6 +251,10 @@ PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/media_profiles.xml:system/etc/media_profiles.xml \
     device/lge/m3s/configs/media_codecs.xml:system/etc/media_codecs.xml
 
+# Enable init.d support.
+PRODUCT_COPY_FILES += \
+    device/lge/m3s/configs/sysinit:system/bin/sysinit
+
 # Audio
 PRODUCT_PACKAGES += \
     audio.primary.msm7x30 \
@@ -281,8 +281,6 @@ PRODUCT_PACKAGES += \
 
 # Media
 PRODUCT_PACKAGES += \
-    mm-vdec-omx-test \
-    mm-venc-omx-test720p \
     libdivxdrmdecrypt \
     libc2dcolorconvert \
     libstagefrighthw \
@@ -335,6 +333,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
 device/lge/m3s/configs/nfcee_access_debug.xml:system/etc/nfcee_access.xml
 
+
+PRODUCT_PACKAGES += \
+    libhealthd.msm7x30
+
 #CMAS Support
 PRODUCT_PACKAGES += \
    CellBroadcastReceiver
@@ -370,7 +372,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.nfc.fw_download=true \
     debug.nfc.fw_boot_download=false \
     debug.nfc.se=true \
-    ro.nfc.port=I2C
+    ro.nfc.port=I2C \
+    ro.bq.gpu_to_cpu_unsupported=1
     
 ADDITIONAL_DEFAULT_PROPERTIES := \
     persist.sys.usb.config=mass_storage,adb \

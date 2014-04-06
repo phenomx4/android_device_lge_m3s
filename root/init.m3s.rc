@@ -20,10 +20,10 @@ on init
 
 
 # create mountpoints
-    mkdir /storage 0775 root system
-    mkdir /mnt 0775 root system
-    mkdir /storage/sdcard0 0000 system system
-    mkdir /storage/sdcard1 0000 system system
+    mkdir /mnt/media_rw/sdcard0 0700 media_rw media_rw
+    mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
+    mkdir /storage/sdcard0 0700 root root
+    mkdir /storage/sdcard1 0700 root root
 
 # Create cgroup mount point for cpu accounting
     mkdir /acct
@@ -59,9 +59,17 @@ on init
 setprop ro.crypto.tmpfs_options size=128m,mode=0771,uid=1000,gid=1000
 
 on emmc-fs
-    # mount mmc partitions
+    # Bt & Wifi Mac [start]
+    mount ext4 /dev/block/mmcblk0p12 /system rw barrier=1 data=ordered    
+    exec /system/bin/hwaddrs
+    mount ext4 /dev/block/mmcblk0p12 /system ro barrier=1 data=ordered
+    # Bt & Wifi Mac [end]
     
+    # mount mmc partitions
     mount_all fstab.qcom
+    
+    #zram
+    swapon_all fstab.qcom
     
   #  start flash_recovery
 
@@ -105,12 +113,6 @@ on post-fs
     mkdir /data/misc/sensors 0775 root root
     write /data/system/sensors/settings 0
     chmod 0664 /data/system/sensors/settings
-
-    # If there is no fs-post-data action in the init.<device>.rc file, you
-    # must uncomment this line, otherwise encrypted filesystems
-    # won't work.
-    # Set indication (checked by vold) that we have finished this action
-    setprop vold.post_fs_data_done 1
 
 # LGE_CHANGE_S hyungsoo.kim@lge.com		
     chown system audio /dev/msm_audio_misc
@@ -311,17 +313,17 @@ service formatfat /system/bin/sh /system/etc/format_fat32.sh
     oneshot
 # [END] LGE_USE_INTERNAL_FAT
 
-service wifimac /system/bin/sh /system/bin/wifimac.sh
-    oneshot
-
 service flash_recovery /system/etc/install-recovery.sh
     class main
     oneshot
     
-service btmac /system/bin/btmac
-    class main
-    oneshot
+service fuse_sdcard0 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard0 /storage/sdcard0
+    class late_start
+    disabled
 
+service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
+    class late_start
+    disabled
 
 // volume up + down dumpstate in /data/dontpanic, imported from VS920
 on property:ro.build.type=eng

@@ -67,23 +67,26 @@ static int camera_get_camera_info(int camera_id, struct camera_info *info);
 int camera_get_number_of_cameras(void);
 
 static struct hw_module_methods_t camera_module_methods = {
-        open: camera_device_open
+        .open = camera_device_open
 };
 
 camera_module_t HAL_MODULE_INFO_SYM = {
-    common: {
-         tag: HARDWARE_MODULE_TAG,
-        module_api_version: CAMERA_DEVICE_API_VERSION_1_0,
-        hal_api_version: 0,
-         id: CAMERA_HARDWARE_MODULE_ID,
-         name: "msm7x30 CameraHal Module",
-         author: "Zhibin Wu",
-         methods: &camera_module_methods,
-         dso: NULL, /* remove compilation warnings */
-         reserved: {0}, /* remove compilation warnings */
+    .common = {
+         .tag = HARDWARE_MODULE_TAG,
+         .module_api_version = CAMERA_DEVICE_API_VERSION_1_0,
+         .hal_api_version = HARDWARE_HAL_API_VERSION,
+         .id = CAMERA_HARDWARE_MODULE_ID,
+         .name = "msm7x30 CameraHal Module",
+         .author = "Zhibin Wu",
+         .methods = &camera_module_methods,
+         .dso = NULL, /* remove compilation warnings */
+         .reserved = {0}, /* remove compilation warnings */
     },
-    get_number_of_cameras: camera_get_number_of_cameras,
-    get_camera_info: camera_get_camera_info,
+    .get_number_of_cameras = camera_get_number_of_cameras,
+    .get_camera_info = camera_get_camera_info,
+    .set_callbacks = NULL, /* remove compilation warnings */
+    .get_vendor_tag_ops = NULL, /* remove compilation warnings */
+    .reserved = {0}, /* remove compilation warnings */
 };
 
 typedef struct priv_camera_device {
@@ -448,6 +451,29 @@ void CameraHAL_FixupParams(android::CameraParameters &camParams, priv_camera_dev
       camParams.set(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
                    preferred_size);
    }
+    if (camParams.get(CameraParameters::KEY_MAX_CONTRAST)) {
+        camParams.set("max-contrast",
+            camParams.get(CameraParameters::KEY_MAX_CONTRAST));
+    } else {
+        camParams.set("max-contrast",
+            -1);
+    }
+
+    if (camParams.get(CameraParameters::KEY_MAX_SATURATION)) {
+        camParams.set("max-saturation",
+            camParams.get(CameraParameters::KEY_MAX_SATURATION));
+    } else {
+        camParams.set("max-saturation",
+            -1);
+    }
+
+    if (camParams.get(CameraParameters::KEY_MAX_SHARPNESS)) {
+        camParams.set("max-sharpness",
+            camParams.get(CameraParameters::KEY_MAX_SHARPNESS));
+    } else {
+        camParams.set("max-sharpness",
+            -1);
+    }
 }
 
 int camera_set_preview_window(struct camera_device * device,

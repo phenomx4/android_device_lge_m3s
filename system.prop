@@ -163,9 +163,20 @@ net.dns2=8.8.4.4
 wifi.supplicant_scan_interval=90
 softap.interface=wlan1
 wifi.ap.interface=wlan0
+#debug.gr.numframebuffers=3
 persist.sys.usbcharger.enable=1
+#ro.telephony.call_ring.multiple=false
 
 persist.sys.purgeable_assets=1
+sys.mem.max_hidden_apps=2
+ro.bq.gpu_to_cpu_unsupported=1
+ro.config.low_ram=true
+
+# Webkit
+persist.webview.provider=classic
+
+ro.media.panorama.defres=3264x1840
+ro.media.panorama.frameres=1280x720
 
 ro.bt.bdaddr_path=/data/misc/bluedroid/bdaddr
 

@@ -2,9 +2,7 @@ From: Vinson Gates <phenomx49850@gmail.com>
 Date: Thur, 22 Aug 2013 07:50:07 -0600
 Subject: [PATCH] binder: patch for parcel for some RIL's that need it
 
-This is a patch needed for some RIL's to make the radio functional in CM10. You need to add 
-
-"RIL_NEED_PARCEL_PATCH := true" into your Boardconfig to make this patch effective.
+This is a patch needed for some RIL's to make the radio functional in CM10
 
 diff --git a/native/include/binder/Parcel.h b/native/include/binder/Parcel.h
 --- /frameworks/native/include/binder/Parcel.h
