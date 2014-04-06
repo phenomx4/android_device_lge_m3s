@@ -86,7 +86,7 @@
     <!-- Determine whether calls to mute the microphone in PhoneUtils
          are routed through the android.media.AudioManager class (true) or through
          the com.android.internal.telephony.Phone interface (false). -->
-    <bool name="send_mic_mute_to_AudioManager">false</bool>
+    <bool name="send_mic_mute_to_AudioManager">true</bool>
 
     <!-- Determines if device implements a noise suppression device for in call audio-->
     <bool name="has_in_call_noise_suppression">false</bool>
@@ -115,10 +115,6 @@
 
     <!-- If true, removes the Voice Privacy option from Call Settings -->
     <bool name="config_voice_privacy_disable">false</bool>
-
-    <!-- True if the device has a fixed keyboard (as oposite to a sliding one) so keyboard is
-         always open. Will modify proximity checking behaviour. -->
-    <bool name="config_device_has_fixed_keyboard">false</bool>
 
     <!-- Sprint Message Wait Indicator Quirk
          If true, message wait indicators are hidden by default on this device

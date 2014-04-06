@@ -15,8 +15,6 @@
  *
  */
 
-#error "BUILDING WITH THE ION HEADER"
-
 #ifndef _LINUX_ION_H
 #define _LINUX_ION_H
 

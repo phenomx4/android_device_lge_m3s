@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
+
 #include <errno.h>
 #include <string.h>
 
@@ -31,12 +32,13 @@ static uint8_t pn544_eedata_settings[][4] = {
     ,{0x00,0x9B,0xD6,0x1E} // GSP setting for this threshold
     ,{0x00,0x9B,0xDD,0x1C} // GSP setting for this threshold
     ,{0x00,0x9B,0x84,0x13} // ANACM2 setting
-
-    // Load modulation settings
-    ,{0x00,0x99,0x29,0xF4} // Type A load modulation amplitude fine tuning
-    ,{0x00,0x99,0x2A,0xF4} // Type B load modulation amplitude fine tuning
-    ,{0x00,0x99,0x2B,0xF4} // Type B' load modulation amplitude fine tuning
-    ,{0x00,0x99,0x85,0xF1} // Type Felica load modulation amplitude fine tuning
+    ,{0x00,0x99,0x81,0x7F} // ANAVMID setting PCD
+    ,{0x00,0x99,0x7A,0x04} // ANATXMODGSPON
+    ,{0x00,0x99,0x77,0x40} // ANATXCWGSPON
+    ,{0x00,0x99,0x31,0x70} // ANAVMID setting PICC
+    ,{0x00,0x99,0x2A,0xF5} // ANATXMODGSN-TYPEB
+    ,{0x00,0x99,0x29,0xF5} // ANATXMODGSN-TYPEA
+    //
 
     // Enable PBTF
     ,{0x00,0x98,0x00,0x3F} // SECURE_ELEMENT_CONFIGURATION - No Secure Element
@@ -48,7 +50,7 @@ static uint8_t pn544_eedata_settings[][4] = {
     ,{0x00,0x99,0x23,0x00} // Default Value is 0x01
 
     // Low-power polling
-    ,{0x00,0x9E,0x74,0xB0} // Default Value is 0x00, bits 0->2: sensitivity (0==max, 6==min),
+    ,{0x00,0x9E,0x74,0xB0} // Default Value is 0x00, bits 0->2: sensitivity (0==max,  6==min),
                            // bit 3: RFU,
                            // bits 4,5 hybrid low-power: # of low-power polls per regular poll
                            // bit 6: RFU
@@ -59,6 +61,10 @@ static uint8_t pn544_eedata_settings[][4] = {
                            // bit 6: RFU,
                            // bit 7: Enable or disable retry mechanism (0: disable, 1: enable)
     ,{0x00,0x9F,0x28,0x01} // bits 0->7: # of measurements per low-power poll
+
+    // Polling Loop - Card Emulation Timeout
+    ,{0x00,0x9F,0x35,0x14} // Time for which PN544 stays in Card Emulation mode after leaving RF field
+    ,{0x00,0x9F,0x36,0x60} // Default value 0x0411 = 50 ms ---> New Value : 0x1460 = 250 ms
 
     //LLC Timer
     ,{0x00,0x9C,0x31,0x00} // Guard host time-out in ms (MSB)
@@ -113,7 +119,7 @@ static int nfc_open(const hw_module_t* module, const char* name,
         dev->eeprom_settings = (uint8_t*)pn544_eedata_settings;
         dev->linktype = PN544_LINK_TYPE_I2C;
         dev->device_node = "/dev/pn544";
-        dev->enable_i2c_workaround = 1;
+        dev->enable_i2c_workaround = 0;
         *device = (hw_device_t*) dev;
         return 0;
     } else {
@@ -131,8 +137,9 @@ struct nfc_module_t HAL_MODULE_INFO_SYM = {
         .version_major = 1,
         .version_minor = 0,
         .id = NFC_HARDWARE_MODULE_ID,
-        .name = "NFC HW HAL",
+        .name = "Optimus Elite (M3S) NFC HW HAL",
         .author = "The Android Open Source Project",
         .methods = &nfc_module_methods,
     },
 };
+

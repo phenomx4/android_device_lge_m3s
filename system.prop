@@ -6,10 +6,10 @@
 ro.telephony.ril_class=LGEQualcommRIL
 ro.telephony.no_icc=true
 ro.ril.disable.power.collapse=0
-ro.telephony.ril.v3=signalstrength,datacall
+ro.telephony.ril.v3=signalstrength,datacall,singlepdp,datacallapn
 ro.ril.def.preferred.network=4
 ro.telephony.default_network=4
-mobiledata.interfaces=wlan0,rmnet0
+mobiledata.interfaces=wlan0,rmnet0,rmnet1,rmnet2
 rild.libpath=/system/lib/libril-qc-qmi-1.so
 rild.libargs=-d /dev/smd0
 persist.rild.nitz_plmn=
@@ -21,11 +21,7 @@ persist.rild.nitz_short_ons_0=
 persist.rild.nitz_short_ons_1=
 persist.rild.nitz_short_ons_2=
 persist.rild.nitz_short_ons_3=
-ril.subscription.types=NV,RUIM
-DEVICE_PROVISIONED=1
-#20120220 suhyun.lee@lge.com FRAMEWORKS M3S increase 24m => 32m
-#dalvik.vm.heapsize=32m
-#dalvik.vm.heapsize=64m
+ril.subscription.types=NV
 dev.pm.dyn_samplingrate=1
 
 #
@@ -43,9 +39,9 @@ persist.cne.rat.acq.time.out=30000
 persist.cne.rat.acq.retry.tout=0
 
 #
-lpa.decode=true
-#20111121 kyungyoul.lee@lge.com FRAMEWORKS M3S - not use HDMI
-#ro.hdmi.enable=true
+lpa.decode=false
+tunnel.decode=true
+lpa.use-stagefright=true
 
 #
 # system props for the data modules
@@ -100,8 +96,6 @@ ro.telephony.gsm.spn.shortname=true
 
 ro.cdma.voicemail.number=mine
 
-#persist.service.diag.enable=1
-
 # hyoill.leem 2012.01.16 usb port enable/disable
 persist.service.usbport.enable=1
 # hyoill.leem 2012.01.16 usb port enable/disable
@@ -138,78 +132,36 @@ debug.nfc.fw_boot_download=false
 debug.nfc.se=true
 ro.nfc.port=I2C 
 
-# VOLD_SUPPORT_CRYPT
-# EAS Data encryption for Sprint
-#persist.sys.email.crypt=0
-#persist.sys.email.crypt_ext=0
-#persist.sys.email.crypt_int=0
-
-persist.service.adb.enable=1
-dalvik.vm.dexopt-data-only=1
 service.adb.root=1
-ro.additionalmounts=/mnt/sdcard
-ro.vold.switchablepair=/mnt/sdcard,/mnt/emmc
+ro.additionalmounts=/storage/sdcard1
+ro.vold.switchablepair=/storage/sdcard0,/storage/sdcard1
 debug.enabletr=false
 debug.composition.type=gpu
-ro.sf.compbypass.enable=0
 com.qc.hardware=true
 hwui.render_dirty_regions=false
-hwui.disable_vsync=true
+hwui.disable_vsync=false
 ro.config.disable_hw_accel=false
 debug.sf.hw=1
 debug.performance.tuning=1
 video.accelerate.hw=1
 debug.egl.profiler=1
 debug.egl.hw=1
+persist.sys.ui.hw=1
 
-ro.telephony.call_ring.delay=0
-ring.delay=0
-
-persist.telephony.support.ipv6=1
-persist.telephony.support.ipv4=1
-
-windowsmgr.max_events_per_sec=150
-ro.min_pointer_dur=8
-ro.max.fling_velocity=12000
-ro.min.fling_velocity=8000
-
-persist.cust.tel.eons=1
-ro.ril.enable.amr.wideband=1
-ro.config.hw_fast_dormancy=1
-
-profiler.force_disable_err_rpt=1
-profiler.force_disable_ulog=1
-
-ro.kernel.android.checkjni=0
-ro.kernel.checkjni=0
-
-ro.config.hw_quickpoweron=true
-
-dalvik.vm.checkjni=false
+dalvik.vm.checkjni=0
 dalvik.vm.dexopt-data-only=1
-dalvik.vm.verify-bytecode=false
+dalvik.vm.dexopt-flags=v=a,o=v,m=y,u=y
 dalvik.vm.execution-mode=int:jit
-dalvik.vm.lockprof.threshold=250
-dalvik.vm.stack-trace-file=/data/anr/traces.txt
-dalvik.vm.jmiopts=forcecopy
-
-ro.config.nocheckin=1
-
-persist.sys.use_dithering=0
 
 persist.sys.usb.config=mass_storage,rndis,adb
 
 net.dns1=8.8.8.8
 net.dns2=8.8.4.4
 wifi.supplicant_scan_interval=90
-softap.interface=wlan0
+softap.interface=wlan1
 wifi.ap.interface=wlan0
-debug.gr.numframebuffers=3
-ro.config.disable_hw_accel=false
 persist.sys.usbcharger.enable=1
-ro.telephony.call_ring.multiple=false
 
 persist.sys.purgeable_assets=1
-sys.mem.max_hidden_apps=3
 
 ################ end system.prop

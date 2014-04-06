@@ -116,10 +116,6 @@
     <!-- If true, removes the Voice Privacy option from Call Settings -->
     <bool name="config_voice_privacy_disable">false</bool>
 
-    <!-- True if the device has a fixed keyboard (as oposite to a sliding one) so keyboard is
-         always open. Will modify proximity checking behaviour. -->
-    <bool name="config_device_has_fixed_keyboard">false</bool>
-
     <!-- Sprint Message Wait Indicator Quirk
          If true, message wait indicators are hidden by default on this device
          unless the user enables it in Call Settings.  This quirk is necessary

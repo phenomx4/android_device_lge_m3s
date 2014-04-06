@@ -1,6 +1,6 @@
-$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_small.mk)
 
-$(call inherit-product, frameworks/base/build/phone-hdpi-512-dalvik-heap.mk)
+$(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
@@ -10,19 +10,8 @@ $(call inherit-product, vendor/cm/config/themes_common.mk)
 
 $(call inherit-product, build/target/product/full.mk)
 
-$(call inherit-product, build/target/product/full_base.mk)
-
 # Inherit non-open-source blobs.
 $(call inherit-product-if-exists, vendor/lge/m3s/m3s-vendor-blobs.mk)
-$(call inherit-product-if-exists, vendor/qcom/proprietary/qcom-vendor.mk)
-$(call inherit-product-if-exists, vendor/nxp/m3s/device-m3s.mk)
-
-PRODUCT_BUILD_PROP_OVERRIDES += \
-    BUILD_VERSION_TAGS=release-keys \
-    TARGET_BUILD_TYPE=user
-
-# OTA stuff
-DATEANDTIME = $(shell date +'%Y%m%d-%H%M')
 
 # Sprint
 M3S_LS696 := false
@@ -115,21 +104,20 @@ TARGET_BOOTANIMATION_NAME := vertical-320x480
 
 # Permissions
 PRODUCT_COPY_FILES += \
-    frameworks/base/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    frameworks/base/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
-    frameworks/base/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
-    frameworks/base/data/etc/android.hardware.camera.xml:system/etc/permissions/android.hardware.camera.xml \
-    frameworks/base/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
-    frameworks/base/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
-    frameworks/base/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
-    frameworks/base/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
-    frameworks/base/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
-    frameworks/base/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
-    frameworks/base/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
-    frameworks/base/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
-    frameworks/base/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
+    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+    frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
+    frameworks/native/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
+    frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
+    frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
+    frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+    frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
+    frameworks/native/data/etc/android.hardware.touchscreen.multitouch.distinct.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.distinct.xml \
+    frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
+    frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
+    frameworks/native/data/etc/android.hardware.sensor.accelerometer.xml:system/etc/permissions/android.hardware.sensor.accelerometer.xml \
+    frameworks/native/data/etc/android.hardware.sensor.compass.xml:system/etc/permissions/android.hardware.sensor.compass.xml \
     frameworks/base/nfc-extras/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
-    device/sample/nxp/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml
+    frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml
 
 PRODUCT_COPY_FILES += \
     device/lge/m3s/prebuilt/vold.fstab:system/etc/vold.fstab
@@ -195,6 +183,7 @@ PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/01_qcomm_omx.cfg:system/etc/01_qcomm_omx.cfg \
     device/lge/m3s/configs/loc_parameter.ini:system/etc/loc_parameter.ini \
     device/lge/m3s/configs/auto_pairing.conf:system/etc/auto_pairing.conf \
+    device/lge/m3s/configs/audio_policy.conf:system/etc/audio_policy.conf \
     device/lge/m3s/configs/pvplayer.cfg:system/etc/pvplayer.cfg \
     device/lge/m3s/configs/thermald.conf:system/etc/thermald.conf \
     device/lge/m3s/configs/input.conf:system/etc/input.conf \
@@ -250,34 +239,25 @@ PRODUCT_COPY_FILES +=\
     device/lge/m3s/root/init:root/init 
 
 PRODUCT_COPY_FILES += \
-    device/lge/m3s/firmware/a225p5_pm4.fw:system/etc/firmware/a225p5_pm4.fw \
-    device/lge/m3s/firmware/a225_pfp.fw:system/etc/firmware/a225_pfp.fw \
-    device/lge/m3s/firmware/a225_pm4.fw:system/etc/firmware/a225_pm4.fw \
-    device/lge/m3s/firmware/a300_pfp.fw:system/etc/firmware/a300_pfp.fw \
-    device/lge/m3s/firmware/a300_pm4.fw:system/etc/firmware/a300_pm4.fw \
-    device/lge/m3s/firmware/a225p5_pm4.fw:system/etc/firmware/a225p5_pm4.fw \
-    device/lge/m3s//firmware/cyttsp_7630_fluid.hex:system/etc/firmware/cyttsp_7630_fluid.hex \
-    device/lge/m3s/firmware/leia_pfp_470.fw:system/etc/firmware/leia_pfp_470.fw \
-    device/lge/m3s/firmware/leia_pm4_470.fw:system/etc/firmware/leia_pm4_470.fw \
+    device/lge/m3s/firmware/cyttsp_7630_fluid.hex:system/etc/firmware/cyttsp_7630_fluid.hex \
     device/lge/m3s/firmware/vidc_720p_command_control.fw:system/etc/firmware/vidc_720p_command_control.fw \
     device/lge/m3s/firmware/vidc_720p_h263_dec_mc.fw:system/etc/firmware/vidc_720p_h263_dec_mc.fw \
     device/lge/m3s/firmware/vidc_720p_h264_dec_mc.fw:system/etc/firmware/vidc_720p_h264_dec_mc.fw \
     device/lge/m3s/firmware/vidc_720p_h264_enc_mc.fw:system/etc/firmware/vidc_720p_h264_enc_mc.fw \
     device/lge/m3s/firmware/vidc_720p_mp4_dec_mc.fw:system/etc/firmware/vidc_720p_mp4_dec_mc.fw \
     device/lge/m3s/firmware/vidc_720p_mp4_enc_mc.fw:system/etc/firmware/vidc_720p_mp4_enc_mc.fw \
-    device/lge/m3s/firmware/vidc_720p_vc1_dec_mc.fw:system/etc/firmware/vidc_720p_vc1_dec_mc.fw \
-    device/lge/m3s/firmware/yamato_pfp.fw:system/etc/firmware/yamato_pfp.fw	\
-    device/lge/m3s/firmware/yamato_pm4.fw:system/etc/firmware/yamato_pm4.fw
+    device/lge/m3s/firmware/vidc_720p_vc1_dec_mc.fw:system/etc/firmware/vidc_720p_vc1_dec_mc.fw 
 
 PRODUCT_COPY_FILES += \
     device/lge/m3s/prebuilt/wifi/WCN1314_rf.ko:system/lib/modules/volans/WCN1314_rf.ko \
     device/lge/m3s/prebuilt/wifi/WCN1314_rf_ftm.ko:system/lib/modules/volans/WCN1314_rf_ftm.ko \
-    device/lge/m3s/prebuilt/wifi/wlan.ko:system/lib/modules/wlan.ko 
+    device/lge/m3s/prebuilt/wifi/wlan.ko:system/lib/modules/wlan.ko \
+    device/lge/m3s/prebuilt/wifi/librasdioif.ko:system/lib/modules/librasdioif.ko \
+    device/lge/m3s/configs/wifimac.sh:system/bin/wifimac.sh
 
 PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/media_profiles.xml:system/etc/media_profiles.xml \
     device/lge/m3s/configs/media_codecs.xml:system/etc/media_codecs.xml
-
 
 # Audio
 PRODUCT_PACKAGES += \
@@ -295,7 +275,8 @@ PRODUCT_PACKAGES += \
     libmemalloc \
     liboverlay \
     libQcomUI \
-    libtilerenderer 
+    libtilerenderer \
+    libc2dcolorconvert
 
 # Media
 PRODUCT_PACKAGES += \
@@ -332,7 +313,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     nfc.msm7x30
 
-PRODUCT_PACKAGES += \
+#PRODUCT_PACKAGES += \
     Torch
 
 # NFC
@@ -354,18 +335,17 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
 device/lge/m3s/configs/nfcee_access_debug.xml:system/etc/nfcee_access.xml
 
-#APN
-PRODUCT_COPY_FILES += \
-device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
-
-BOARD_HAVE_NFC := true
-
-# Enhanced NFC
-$(call inherit-product, vendor/cm/config/nfc_enhanced.mk)
+#HWPROPS
+PRODUCT_PACKAGES += \
+    hwaddrs 
 
 #CMFileManager
 PRODUCT_PACKAGES += \
     CMFileManager 
+
+#CMAS Support
+PRODUCT_PACKAGES += \
+   CellBroadcastReceiver
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
@@ -376,8 +356,19 @@ PRODUCT_PACKAGES += \
    wpa_cli \
    hostapd \
    hostapd_cli 
+   
+PRODUCT_TAGS += dalvik.gc.type-precise   
 
 PRODUCT_PROPERTY_OVERRIDES += \
+    ro.product.camera=msm7630 \
+    ro.com.google.locationfeatures=1 \
+    ro.com.google.networklocation=1 \
+    ro.com.google.gmsversion=2.3_r6 \
+    ro.setupwizard.enable_bypass=1 \
     dalvik.vm.lockprof.threshold=500 \
     dalvik.vm.dexopt-flags=m=y \
-    ro.bt.bdaddr_path=/data/misc/bd_addr
+    ro.bt.bdaddr_path=/data/misc/bd_addr \
+    debug.nfc.fw_download=true \
+    debug.nfc.fw_boot_download=false \
+    debug.nfc.se=true \
+    ro.nfc.port=I2C

@@ -21,19 +21,13 @@
      for different hardware and product builds. -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <bool name="config_animateScreenLights">true</bool>
+    <bool name="config_animateScreenLights">false</bool>
 
     <!-- The default iface on which to monitor data use -->
     <string name="config_datause_iface">rmnet0</string>
 
-    <!-- Component name of the service providing network location support. -->
-    <string name="config_networkLocationProvider">com.google.android.location.NetworkLocationProvider</string>
-
-    <!-- Component name of the service providing geocoder API support. -->
-    <string name="config_geocodeProvider">com.google.android.location.GeocodeProvider</string>
-
     <string-array translatable="false" name="config_tether_usb_regexs">
-    <item>"rndis\\d"</item>
+    <item>"rndis0"</item>
     </string-array>
 
     <!-- Array of ConnectivityManager.TYPE_xxxx values allowable for tethering -->
@@ -57,8 +51,13 @@
          Wifi interfaces.  If the device doesn't want to support tethering over Wifi this
          should be empty.  An example would be "softap.*" -->
     <string-array translatable="false" name="config_tether_wifi_regexs">
-        <item>"softap.*"</item>
-	<item>"wlan0"</item>
+	<item>"softap.*"</item>
+    </string-array>
+
+    <!-- List of regexpressions describing the interface (if any) that represent tetherable
+         WiMAX interfaces.  If the device doesn't want to support tethering over Wifi this
+         should be empty.  An example would be "softap.*" -->
+    <string-array translatable="false" name="config_tether_wimax_regexs">
     </string-array>
 
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
@@ -74,6 +73,42 @@
 
     <!-- Dhcp range (min, max) to use for tethering purposes -->
     <string-array translatable="false" name="config_tether_dhcp_range">
+    </string-array>
+
+    <!-- Regex of wired ethernet ifaces -->
+    <string translatable="false" name="config_ethernet_iface_regex">
+	<item>wlan\\d</item>
+    </string>
+
+    <!-- If the mobile hotspot feature requires provisioning, a package name and class name
+        can be provided to launch a supported application that provisions the devices.
+
+        Example Usage:
+
+        String[] appDetails = getStringArray(R.array.config_mobile_hotspot_provision_app);
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName(appDetails[0], appDetails[1]);
+        startActivityForResult(intent, 0);
+
+        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+            super.onActivityResult(requestCode, resultCode, intent);
+            if (requestCode == 0) {
+                if (resultCode == Activity.RESULT_OK) {
+                    //Mobile hotspot provisioning successful
+                } else {
+                    //Mobile hotspot provisioning failed
+                }
+            }
+
+        See src/com/android/settings/TetherSettings.java for more details.
+        -->
+    <!-- The first element is the package name and the second element is the class name
+         of the provisioning app -->
+    <string-array translatable="false" name="config_mobile_hotspot_provision_app">
+    <!--
+        <item>com.example.provisioning</item>
+        <item>com.example.provisioning.Activity</item>
+    -->
     </string-array>
 
     <!-- Array of ConnectivityManager.TYPE_xxxx values allowable for tethering -->
@@ -129,19 +164,10 @@
                   specified -->
     <string name="default_wallpaper_component">com.android.phasebeam/.PhaseBeamWallpaper</string>
 
-    <bool name="config_disableMenuKeyInLockScreen">true</bool>
+    <bool name="config_disableMenuKeyInLockScreen">false</bool>
 
-    <!-- Hardware 'face' keys present on the device, stored as a bit field.
-    This integer should equal the sum of the corresponding value for each
-    of the following keys present:
-    1 - Home
-    2 - Back
-    4 - Menu
-    8 - Assistant (search)
-    16 - App switch
-    For example, a device with Home, Back and Menu keys would set this
-    config to 7. -->
-    <integer name="config_deviceHardwareKeys">15</integer>
+    <!-- Menu+Home+Back -->
+    <integer name="config_deviceHardwareKeys">7</integer>
 
     <!-- Boolean indicating if current platform supports quick switch-on/off of
                            Bluetooth Module -->
@@ -212,34 +238,5 @@ icons in the status bar that are not notifications. -->
        <item><xliff:g id="id">secure</xliff:g></item>
        <item><xliff:g id="id">clock</xliff:g></item>
     </string-array>
-
-    <!-- Indicate whether the SD card is accessible without removing the battery. -->
-    <bool name="config_batterySdCardAccessibility">true</bool>
-
-    <!-- We dont have different firmware for wifi modes, prevent reloading it -->
-    <bool name="config_wifi_ap_firmware_reload">false</bool> 
-
-    <!-- Flag indicating whether the current device is "voice capable".
-    If true, this means that the device supports circuit-switched
-    (i.e. voice) phone calls over the telephony network, and is
-    allowed to display the in-call UI while a cellular voice call is
-    active. This can be overridden to false for "data only" devices
-    which can't make voice calls and don't support any in-call UI.
-
-    Note: this flag is subtly different from the
-    PackageManager.FEATURE_TELEPHONY system feature, which is
-    available on *any* device with a telephony radio, even if the
-    device is data-only. -->
-    <bool name="config_voice_capable">true</bool>
-
-    <!-- Flag indicating whether the current device allows sms service.
-    If true, this means that the device supports both sending and
-    receiving sms via the telephony network.
-    This can be overridden to false for "data only" devices
-    which can't send and receive sms message.
-
-    Note: Disable SMS also disable voicemail waiting sms,
-    cell broadcasting sms, and MMS. -->
-    <bool name="config_sms_capable">true</bool>
 
 </resources>
