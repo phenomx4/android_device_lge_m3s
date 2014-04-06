@@ -251,10 +251,6 @@ PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/media_profiles.xml:system/etc/media_profiles.xml \
     device/lge/m3s/configs/media_codecs.xml:system/etc/media_codecs.xml
 
-# Enable init.d support.
-PRODUCT_COPY_FILES += \
-    device/lge/m3s/configs/sysinit:system/bin/sysinit
-
 # Audio
 PRODUCT_PACKAGES += \
     audio.primary.msm7x30 \
