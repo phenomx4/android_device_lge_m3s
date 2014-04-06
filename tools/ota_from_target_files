@@ -99,7 +99,7 @@ OPTIONS.omit_prereq = False
 OPTIONS.extra_script = None
 OPTIONS.aslr_mode = True
 OPTIONS.worker_threads = 3
-OPTIONS.backuptool = True
+OPTIONS.backuptool = False
 OPTIONS.modelidcfg = True
 OPTIONS.override_device = 'auto'
 
@@ -348,7 +348,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
   device_specific.FullOTA_Assertions()
   device_specific.FullOTA_InstallBegin()
 
-
+  if OPTIONS.backuptool:
     script.Mount("/system")
     script.RunBackup("backup")
     script.Unmount("/system")

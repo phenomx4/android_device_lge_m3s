@@ -2,11 +2,11 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_small.mk)
 
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
-$(call inherit-product, vendor/cm/config/common_full_phone.mk)
+$(call inherit-product, vendor/aokp/configs/common.mk)
 
-$(call inherit-product, vendor/cm/config/cdma.mk)
+$(call inherit-product, vendor/aokp/configs/cdma.mk)
 
-$(call inherit-product, vendor/cm/config/themes_common.mk)
+$(call inherit-product, vendor/aokp/configs/themes_common.mk)
 
 $(call inherit-product, build/target/product/full.mk)
 
@@ -28,7 +28,6 @@ PRODUCT_BRAND			    := lge
 PRODUCT_MODEL			    := LG-LS696
 
 PRODUCT_RELEASE_NAME		    := LG Optimus Elite
--include vendor/cyanogen/products/common_versions.mk
 
 TARGET_OTA_ASSERT_DEVICE	    := m3s_sprint_us,m3s,LS696
 
@@ -62,7 +61,6 @@ PRODUCT_BRAND			    := lge
 PRODUCT_MODEL			    := LG-VM696
 
 PRODUCT_RELEASE_NAME		    := LG Optimus Elite
--include vendor/cyanogen/products/common_versions.mk
 
 TARGET_OTA_ASSERT_DEVICE	    := m3s_virgin_us,m3s,VM696
 
@@ -101,6 +99,12 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.sf.lcd_density=160
 
 TARGET_BOOTANIMATION_NAME := vertical-320x480
+
+TARGET_SCREEN_HEIGHT := 320
+TARGET_SCREEN_WIDTH := 480
+
+PRODUCT_COPY_FILES += \
+vendor/aokp/prebuilt/bootanimation/bootanimation_320_480.zip:system/media/bootanimation.zip
 
 # Permissions
 PRODUCT_COPY_FILES += \
@@ -182,16 +186,16 @@ PRODUCT_COPY_FILES += \
     device/lge/m3s/configs/UserPolicy.xml:system/etc/UserPolicy.xml \
     device/lge/m3s/configs/01_qcomm_omx.cfg:system/etc/01_qcomm_omx.cfg \
     device/lge/m3s/configs/loc_parameter.ini:system/etc/loc_parameter.ini \
-    device/lge/m3s/configs/auto_pairing.conf:system/etc/auto_pairing.conf \
+    device/lge/m3s/configs/auto_pairing.conf:system/etc/bluetooth/auto_pairing.conf \
     device/lge/m3s/configs/audio_policy.conf:system/etc/audio_policy.conf \
     device/lge/m3s/configs/pvplayer.cfg:system/etc/pvplayer.cfg \
     device/lge/m3s/configs/thermald.conf:system/etc/thermald.conf \
     device/lge/m3s/configs/input.conf:system/etc/input.conf \
-    device/lge/m3s/configs/main.conf:system/etc/main.conf \
-    device/lge/m3s/configs/dbus.conf:system/etc/dbus.conf \
-    device/lge/m3s/configs/blacklist.conf:system/etc/blacklist.conf \
-    device/lge/m3s/configs/audio.conf:system/etc/audio.conf \
-    device/lge/m3s/configs/hostapd.conf:system/etc/wifi/hostapd.conf 
+    device/lge/m3s/configs/main.conf:system/etc/bluetooth/main.conf \
+    device/lge/m3s/configs/dbus.conf:system/etc/bluetooth/dbus.conf \
+    device/lge/m3s/configs/blacklist.conf:system/etc/bluetooth/blacklist.conf \
+    device/lge/m3s/configs/audio.conf:system/etc/bluetooth/audio.conf \
+    device/lge/m3s/configs/hostapd.conf:system/etc/wifi/hostapd.conf
 
 PRODUCT_COPY_FILES +=\
     device/lge/m3s/root/chargerimages/battery_charging_08.rle:root/chargerimages/battery_charging_08.rle \
@@ -219,24 +223,16 @@ PRODUCT_COPY_FILES +=\
     device/lge/m3s/root/chargerimages/battery_ani_02.rle:root/chargerimages/battery_ani_02.rle \
     device/lge/m3s/root/chargerimages/battery_wait_ani_01.rle:root/chargerimages/battery_wait_ani_01.rle \
     device/lge/m3s/root/sbin/bootlogo:root/sbin/bootlogo \
-    device/lge/m3s/root/sbin/e2fsck_static:root/sbin/e2fsck_static \
-    device/lge/m3s/root/sbin/tune2fs_static:root/sbin/tune2fs_static \
-    device/lge/m3s/root/sbin/lge_fota:root/sbin/lge_fota \
-    device/lge/m3s/root/sbin/mke2fs_static:root/sbin/mke2fs_static \
-    device/lge/m3s/root/sbin/resize2fs_static:root/sbin/resize2fs_static \
     device/lge/m3s/root/sbin/chargerlogo:root/sbin/chargerlogo \
-    device/lge/m3s/root/sbin/lge_fota:root/sbin/lge_fota \
-    device/lge/m3s/root/sbin/adbd:root/sbin/adbd \
-    device/lge/m3s/root/sbin/initd_support.sh:root/sbin/initd_support.sh \
     device/lge/m3s/root/bootimages/LG_opening_logo.rle:root/bootimages/LG_opening_logo.rle \
     device/lge/m3s/root/init.qcom.sh:root/init.qcom.sh \
-    device/lge/m3s/root/ueventd.rc:root/ueventd.rc \
+    device/lge/m3s/root/ueventd.qcom.rc:root/ueventd.qcom.rc \
     device/lge/m3s/root/init.target.rc:root/init.target.rc \
     device/lge/m3s/root/init.qcom.rc:root/init.qcom.rc \
-    device/lge/m3s/root/lgdms.fota.rc:root/lgdms.fota.rc \
-    device/lge/m3s/root/lgdms.fota_update.rc:root/lgdms.fota_update.rc \
-    device/lge/m3s/root/init.rc:root/init.rc \
-    device/lge/m3s/root/init:root/init 
+    device/lge/m3s/root/init.m3s.rc:root/init.m3s.rc \
+    device/lge/m3s/root/init.msm7x30.usb.rc:root/init.msm7x30.usb.rc \
+    device/lge/m3s/root/fstab.qcom:root/fstab.qcom \
+    device/lge/m3s/root/init.bluetooth.bluedroid.rc:root/init.bluetooth.rc
 
 PRODUCT_COPY_FILES += \
     device/lge/m3s/firmware/cyttsp_7630_fluid.hex:system/etc/firmware/cyttsp_7630_fluid.hex \
@@ -261,10 +257,12 @@ PRODUCT_COPY_FILES += \
 
 # Audio
 PRODUCT_PACKAGES += \
-    audio.a2dp.default \
-    audio_policy.msm7x30 \
     audio.primary.msm7x30 \
-    libaudioutils
+    audio_policy.msm7x30 \
+    audio.a2dp.default \
+    audio.usb.default \
+    libaudio-resampler \
+    libaudioparameter
 
 # Display
 PRODUCT_PACKAGES += \
@@ -275,14 +273,18 @@ PRODUCT_PACKAGES += \
     libmemalloc \
     liboverlay \
     libQcomUI \
-    libtilerenderer \
-    libc2dcolorconvert
+    libtilerenderer 
+    
+#wireless
+PRODUCT_PACKAGES += \
+    libnetcmdiface
 
 # Media
 PRODUCT_PACKAGES += \
     mm-vdec-omx-test \
     mm-venc-omx-test720p \
     libdivxdrmdecrypt \
+    libc2dcolorconvert \
     libstagefrighthw \
     libmm-omxcore \
     libOmxCore \
@@ -298,7 +300,7 @@ PRODUCT_PACKAGES += \
     camera.msm7x30 \
     com.android.future.usb.accessory \
     gps.lge_m3s \
-    lights.lge_m3s \
+    lights.msm7x30 \
     sensors.default
 
 # Live Wallpapers
@@ -307,6 +309,10 @@ PRODUCT_PACKAGES += \
     LiveWallpapersPicker \
     MagicSmokeWallpapers \
     VisualizationWallpapers \
+    Galaxy4 \
+    HoloSpiralWallpaper \
+    NoiseField \
+    SwagPapers \
     librs_jni
 
 # NFC HAL
@@ -325,23 +331,9 @@ PRODUCT_PACKAGES += \
     Tag \
     com.android.nfc_extras
 
-# BT
-PRODUCT_PACKAGES += \
-    hcitool \
-    hci_qcomm_init \
-    hciconfig 
-
 # NFCEE Access
 PRODUCT_COPY_FILES += \
 device/lge/m3s/configs/nfcee_access_debug.xml:system/etc/nfcee_access.xml
-
-#HWPROPS
-PRODUCT_PACKAGES += \
-    hwaddrs 
-
-#CMFileManager
-PRODUCT_PACKAGES += \
-    CMFileManager 
 
 #CMAS Support
 PRODUCT_PACKAGES += \
@@ -350,12 +342,19 @@ PRODUCT_PACKAGES += \
 # Filesystem management tools
 PRODUCT_PACKAGES += \
     make_ext4fs \
-    setup_fs
+    setup_fs \
+    e2fsck \
+    mke2fs \
+    mke2fs.conf \
+    resize2fs \
+    tune2fs
 
 PRODUCT_PACKAGES += \
    wpa_cli \
    hostapd \
-   hostapd_cli 
+   hostapd_cli \
+   hwaddrs \
+   btmac
    
 PRODUCT_TAGS += dalvik.gc.type-precise   
 
@@ -372,3 +371,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.nfc.fw_boot_download=false \
     debug.nfc.se=true \
     ro.nfc.port=I2C
+    
+ADDITIONAL_DEFAULT_PROPERTIES := \
+    persist.sys.usb.config=mass_storage,adb \
+    persist.service.adb.enable=1 \
+    ro.secure=0 \
+    ro.adb.secure=0

@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -82,7 +82,14 @@ shift $(($OPTIND-1))
 # Note that "hci_qcomm_init -e" prints expressions to set the shell variables
 # BTS_DEVICE, BTS_TYPE, BTS_BAUD, and BTS_ADDRESS.
 
+#Selectively Disable sleep
+BOARD=`getprop ro.board.platform`
+
 POWER_CLASS=`getprop qcom.bt.dev_power_class`
+
+#find the transport type
+TRANSPORT=`getprop ro.qualcomm.bt.hci_transport`
+logi "Transport : $TRANSPORT"
 
 case $POWER_CLASS in
   1) PWR_CLASS="-p 0" ;
@@ -106,10 +113,17 @@ esac
 # init does SIGTERM on ctl.stop for service
 trap "kill_hciattach" TERM INT
 
-start_hciattach
+case $TRANSPORT in
+    "smd")
+        echo 1 > /sys/module/hci_smd/parameters/hcismd_set
+     ;;
+     *)
+        logi "start hciattach"
+        start_hciattach
 
-wait $hciattach_pid
-
-logi "Bluetooth stopped"
+        wait $hciattach_pid
+        logi "Bluetooth stopped"
+     ;;
+esac
 
 exit 0

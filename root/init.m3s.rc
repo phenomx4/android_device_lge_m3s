@@ -1,0 +1,333 @@
+import init.target.rc
+import init.msm7x30.usb.rc
+
+on init
+# matthew.choi@lge.com 111019 LGE_FOTA
+    wait /dev/block/mmcblk0
+
+
+
+# setup the global environment
+    export EXTERNAL_STORAGE /storage/sdcard0
+    export ASEC_MOUNTPOINT /mnt/asec
+    export LOOP_MOUNTPOINT /mnt/obb
+# [START] LGE_USE_INTERNAL_FAT
+    export SECONDARY_STORAGE /storage/sdcard1
+    export ASEC_ADD_MOUNTPOINT /mnt/extasec
+    export LOOP_ADD_MOUNTPOINT /mnt/extobb
+# [END] LGE_USE_INTERNAL_FAT
+
+
+
+# create mountpoints
+    mkdir /storage 0775 root system
+    mkdir /mnt 0775 root system
+    mkdir /storage/sdcard0 0000 system system
+    mkdir /storage/sdcard1 0000 system system
+
+# Create cgroup mount point for cpu accounting
+    mkdir /acct
+    mount cgroup none /acct cpuacct
+    mkdir /acct/uid
+
+# Backwards Compat - XXX: Going away in G*
+    symlink /storage/sdcard0 /emmc
+    symlink /storage/sdcard0 /mnt/emmc
+# [START] LGE_USE_INTERNAL_FAT
+    symlink /storage/sdcard1 /sdcard
+    symlink /storage/sdcard1 /mnt/sdcard
+# [END] LGE_USE_INTERNAL_FAT
+
+
+    mkdir /persist 0771 system system
+
+
+# [START] LGE_USE_INTERNAL_FAT
+    mkdir /mnt/extsecure 0700 root root
+    mkdir /mnt/extsecure/staging 0700 root root
+    mkdir /mnt/extsecure/extasec 0700 root root
+# [END] LGE_USE_INTERNAL_FAT
+
+
+# [START] LGE_USE_INTERNAL_FAT
+    mkdir /mnt/extasec  0000 root system
+    mount tmpfs tmpfs /mnt/extasec mode=0755,gid=1000
+    mkdir /mnt/extobb 0700 root system
+    mount tmpfs tmpfs /mnt/extobb mode=0755,gid=1000
+# [END] LGE_USE_INTERNAL_FAT
+
+setprop ro.crypto.tmpfs_options size=128m,mode=0771,uid=1000,gid=1000
+
+on emmc-fs
+    # mount mmc partitions
+    
+    mount_all fstab.qcom
+    
+  #  start flash_recovery
+
+on post-fs
+
+    # Mounting of persist is moved to 'on emmc-fs' and 'on fs' sections
+    # We chown/chmod /persist again so because mount is run as root + defaults
+    chown system system /persist
+    chmod 0771 /persist
+    chmod 0664 /sys/devices/platform/msm_sdcc.1/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.2/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.3/polling
+    chmod 0664 /sys/devices/platform/msm_sdcc.4/polling
+
+    # Chown polling nodes as needed from UI running on system server
+    chown system system /sys/devices/platform/msm_sdcc.1/polling
+    chown system system /sys/devices/platform/msm_sdcc.2/polling
+    chown system system /sys/devices/platform/msm_sdcc.3/polling
+    chown system system /sys/devices/platform/msm_sdcc.4/polling
+
+    # [MPT] change owner
+    chown system system /mpt
+    chown root system /data/dontpanic
+#   chown root log /data/dontpanic
+// volume up + down dumpstate in /data/dontpanic, imported from VS920
+    #chmod 0750 /data/dontpanic
+    chmod 0775 /data/dontpanic 
+    chmod 0775 /mpt
+
+
+# CONFIG_LGE_ERS
+# 0010675: auto reboot and save kernel panic message into file automatically
+    write /sys/devices/platform/ers-kernel.0/ers_panic 1
+
+# create basic filesystem structure
+
+    mkdir /data/misc/vpn/profiles 0770 system system
+
+    chown system radio /system/etc/firmware/wlan/volans/WCN1314_qcom_wlan_nv.bin
+    chmod 0660 /system/etc/firmware/wlan/volans/WCN1314_qcom_wlan_nv.bin
+    mkdir /data/misc/sensors 0775 root root
+    write /data/system/sensors/settings 0
+    chmod 0664 /data/system/sensors/settings
+
+    # If there is no fs-post-data action in the init.<device>.rc file, you
+    # must uncomment this line, otherwise encrypted filesystems
+    # won't work.
+    # Set indication (checked by vold) that we have finished this action
+    setprop vold.post_fs_data_done 1
+
+# LGE_CHANGE_S hyungsoo.kim@lge.com		
+    chown system audio /dev/msm_audio_misc
+    chmod 0660 /dev/msm_audio_misc
+# LGE_CHANGE_E 
+
+# 20120521, jinw.kim@lge.com make ringtone, alarm property directory, from MS695 [START]
+    mkdir /data/audioprop 0777 system system
+# 20120521, jinw.kim@lge.com make ringtone, alarm property directory, from MS695 [END]
+
+    chown system system /sys/class/leds/button-backlight/device/led_blink
+    chown system input /sys/class/input/input2/enable
+    chown system input /sys/class/input/input2/delay
+    chown system input /sys/class/input/input2/wake
+    chown system input /sys/class/input/input2/shape
+    chown compass input /sys/class/input/input2/offsets
+    chown compass input /sys/class/input/input2/dynamic_matrix
+    chown system input /sys/class/input/input3/enable
+    chown system input /sys/class/input/input3/delay
+    chown system input /sys/class/input/input3/wake
+    chown system input /sys/class/input/input3/shape
+    chown compass input /sys/class/input/input3/offsets
+    chown compass input /sys/class/input/input3/dynamic_matrix
+    chown system input /sys/class/input/input4/enable
+    chown system input /sys/class/input/input4/delay
+    chown system input /sys/class/input/input4/wake
+    chown system input /sys/class/input/input4/shape
+    chown compass input /sys/class/input/input4/offsets
+    chown compass input /sys/class/input/input4/dynamic_matrix
+    chown system input /sys/class/input/input5/enable
+    chown system input /sys/class/input/input5/delay
+    chown system input /sys/class/input/input5/wake
+    chown system input /sys/class/input/input5/shape
+    chown compass input /sys/class/input/input5/offsets
+    chown compass input /sys/class/input/input5/dynamic_matrix
+    chown system input /sys/class/input/input6/enable
+    chown system input /sys/class/input/input6/delay
+    chown system input /sys/class/input/input6/wake
+    chown system input /sys/class/input/input6/shape
+    chown compass input /sys/class/input/input6/offsets
+    chown compass input /sys/class/input/input6/dynamic_matrix
+    chown system input /sys/class/input/input7/enable
+    chown system input /sys/class/input/input7/delay
+    chown system input /sys/class/input/input7/wake
+    chown system input /sys/class/input/input7/shape
+    chown compass input /sys/class/input/input7/offsets
+    chown compass input /sys/class/input/input7/dynamic_matrix
+    chown system input /sys/class/input/input8/enable
+    chown system input /sys/class/input/input8/delay
+    chown system input /sys/class/input/input8/wake
+    chown system input /sys/class/input/input8/shape
+    chown compass input /sys/class/input/input8/offsets
+    chown compass input /sys/class/input/input8/dynamic_matrix
+    chown system input /sys/class/input/input9/enable
+    chown system input /sys/class/input/input9/delay
+    chown system input /sys/class/input/input9/wake
+    chown system input /sys/class/input/input9/shape
+    chown compass input /sys/class/input/input9/offsets
+    chown compass input /sys/class/input/input9/dynamic_matrix
+    chown system input /sys/class/input/input10/enable
+    chown system input /sys/class/input/input10/delay
+    chown system input /sys/class/input/input10/wake
+    chown system input /sys/class/input/input10/shape
+    chown compass input /sys/class/input/input10/offsets
+    chown compass input /sys/class/input/input10/dynamic_matrix
+    chown system input /sys/class/input/input11/enable
+    chown system input /sys/class/input/input11/delay
+    chown system input /sys/class/input/input11/wake
+    chown system input /sys/class/input/input11/shape
+    chown compass input /sys/class/input/input11/offsets
+    chown compass input /sys/class/input/input11/dynamic_matrix
+    chown system input /sys/class/input/input12/enable
+    chown system input /sys/class/input/input12/delay
+    chown system input /sys/class/input/input12/wake
+    chown system input /sys/class/input/input12/shape
+    chown compass input /sys/class/input/input12/offsets
+    chown compass input /sys/class/input/input12/dynamic_matrix
+    chown root radio /proc/cmdline
+
+# 20111117 jungseob.kim@lge.com FRAMEWORK CTS permission fail fix [START]
+    chown system system /sys/devices/platform/mddi_r61529_hvga.256/lcd_onoff
+    chown radio radio /sys/devices/platform/testmode.0/sync_cmd
+    chmod 0664 /sys/devices/platform/mddi_r61529_hvga.256/lcd_onoff
+    chmod 0220 /sys/devices/platform/testmode.0/sync_cmd
+# 20111117 jungseob.kim@lge.com FRAMEWORK CTS permission fail fix [END]
+
+    chown root system /sys/devices/platform/lg_diag_cmd/sms_status
+    chown root system /sys/devices/platform/lg_diag_cmd/get_sms
+    chown root system /sys/devices/platform/lg_diag_cmd/set_sms
+    chown root system /sys/devices/platform/lg_diag_cmd/rsp_sms_status
+    chown root system /sys/devices/platform/lg_diag_cmd/rsp_get_sms
+    chown root system /sys/devices/platform/lg_diag_cmd/rsp_set_sms
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/sms_status
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/get_sms
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/set_sms
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/rsp_sms_status
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/rsp_get_sms
+    chmod 0775 /sys/devices/platform/lg_diag_cmd/rsp_set_sms
+
+# Testmode LCD K Cal Test
+      chown system system /sys/devices/platform/msm_fb.65792/mdp_kcal
+      chmod 0644 /sys/devices/platform/msm_fb.65792/mdp_kcal
+      
+# 20111117 jungseob.kim@lge.com FRAMEWORK CTS permission fail fix [START]
+##LGE_CHANGE_S [myeonggyu.son] [2011.04.14] [gelato] : for slate icd cmd [START]
+    chown system system /sys/devices/virtual/lg_fw_diagclass/lg_fw_diagcmd/result
+    chown system system /sys/devices/virtual/lg_fw_diagclass/lg_fw_diagcmd/return
+    chmod 0664 /sys/devices/virtual/lg_fw_diagclass/lg_fw_diagcmd/result
+    chmod 0664 /sys/devices/virtual/lg_fw_diagclass/lg_fw_diagcmd/return
+##LGE_CHANGE_E [myeonggyu.son] [2011.04.14] [gelato] : for slate icd cmd [END]
+# 20111117 jungseob.kim@lge.com FRAMEWORK CTS permission fail fix [END]
+
+# Define TCP buffer sizes for various networks
+#   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
+    setprop net.tcp.buffersize.default 4096,87380,110208,4096,16384,110208
+    setprop net.tcp.buffersize.wifi    4095,87380,110208,4096,16384,110208
+    setprop net.tcp.buffersize.umts    4094,87380,110208,4096,16384,110208
+    setprop net.tcp.buffersize.hspa    4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hsupa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.hsdpa   4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.edge    4093,26280,35040,4096,16384,35040
+    setprop net.tcp.buffersize.gprs    4092,8760,11680,4096,8760,11680
+    setprop net.tcp.buffersize.lte     4094,87380,1220608,4096,16384,1220608
+    setprop net.tcp.buffersize.evdo_b  4094,87380,262144,4096,16384,262144
+
+# Assign TCP buffer thresholds to be ceiling value of technology maximums
+# Increased technology maximums should be reflected here.
+    write /proc/sys/net/core/rmem_max  1220608
+    write /proc/sys/net/core/wmem_max  1220608
+
+    class_start default
+## NFC test_mode - for getting result of testmode
+    chown system system /sys/class/lg_fw_diagclass/lg_fw_diagcmd/nfc_testmode_result
+
+# 2011.12.06 jaeho.cho@lge.com invest diag_enable with system permission
+#2012.02.18 virgin not using
+    chown radio radio /sys/devices/platform/lg_diag_cmd/diag_enable
+    chmod 664 /sys/devices/platform/lg_diag_cmd/diag_enable
+
+# on property:persist.service.diag.enable=0
+#    write /sys/devices/platform/lg_diag_cmd/diag_enable "0"
+
+# on property:persist.service.diag.enable=1
+#    write /sys/devices/platform/lg_diag_cmd/diag_enable "1"
+# 2011.12.06 jaeho.cho@lge.com invest diag_enable with system permission
+
+# 2012.01.16 hyoill.leem@lge.com invest usb_port_enable with system permission
+    chown radio radio /sys/devices/platform/msm_hsusb/gadget/usb_port_enable
+    chmod 664 /sys/devices/platform/msm_hsusb/gadget/usb_port_enable
+
+on property:persist.service.usbport.enable=0
+    write /sys/devices/platform/msm_hsusb/gadget/usb_port_enable "0"
+
+on property:persist.service.usbport.enable=1
+    write /sys/devices/platform/msm_hsusb/gadget/usb_port_enable "1"
+# 2012.01.16 hyoill.leem@lge.com invest usb_port_enable with system permission
+
+## LGE_EMMC_SUPPORT - this is for the testmode, permissions are required to access from userspace
+    chown system system /sys/module/lge_emmc_direct_access/parameters/fota_id_check
+    chown system system /sys/module/lge_emmc_direct_access/parameters/fota_id_read
+
+	chown system system /sys/module/lge_emmc_direct_access/parameters/write_block
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/write_block
+	chown system system /sys/module/lge_emmc_direct_access/parameters/read_block
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/read_block
+    
+	chown system system /sys/module/lge_emmc_direct_access/parameters/boot_info
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/boot_info
+	chown system system /sys/module/lge_emmc_direct_access/parameters/db_integrity_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/db_integrity_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/fpri_crc_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/fpri_crc_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/file_crc_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/file_crc_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/code_partition_crc_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/code_partition_crc_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/total_crc_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/total_crc_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/db_dump_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/db_dump_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/db_copy_ready
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/db_copy_ready
+	chown system system /sys/module/lge_emmc_direct_access/parameters/integrity_ret
+	chmod 0660 /sys/module/lge_emmc_direct_access/parameters/integrity_ret
+    #VOLD_SUPPORT_CRYPT
+#    chown system system /sys/module/lge_emmc_direct_access/parameters/cryptfs_cmd
+#    chmod 0770 /sys/module/lge_emmc_direct_access/parameters/cryptfs_cmd
+
+## for switching USB pid //LG_FW_SPG_PORT
+    chown radio radio /sys/module/android/parameters/product_id  
+    chmod 0664 /sys/module/android/parameters/product_id 
+    
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq "1024000"
+
+
+# [START] LGE_USE_INTERNAL_FAT
+service formatfat /system/bin/sh /system/etc/format_fat32.sh
+    oneshot
+# [END] LGE_USE_INTERNAL_FAT
+
+service wifimac /system/bin/sh /system/bin/wifimac.sh
+    oneshot
+
+service flash_recovery /system/etc/install-recovery.sh
+    class main
+    oneshot
+    
+service btmac /system/bin/btmac
+    class main
+    oneshot
+
+
+// volume up + down dumpstate in /data/dontpanic, imported from VS920
+on property:ro.build.type=eng
+   chmod 0777 /data/dontpanic
+   
+on property:ro.build.type=userdebug
+   chmod 0777 /data/dontpanic
+   
+setprop vold.post_fs_data_done 1

@@ -28,21 +28,24 @@
 #
 
 on boot
-# LGE_CHANGE_S [2011.11.06] M3S : changhwan.roe@lge.com init.m3s.rc [START]
-    mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
-    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
-    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
-    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    # bluetooth
+    chmod 0660 /dev/ttyHS0
+    chmod 0660 /proc/bluetooth/sleep/proto
+    chmod 0660 /sys/class/rfkill/rfkill0/state
+    chmod 0660 /sys/class/rfkill/rfkill0/type
+    chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
     chown system system /sys/module/sco/parameters/disable_esco
     chmod 0660 /sys/module/bluetooth_power/parameters/power
-    chmod 0660 /sys/class/rfkill/rfkill0/state
-    chmod 0660 /proc/bluetooth/sleep/proto
     chown bluetooth bluetooth /dev/ttyHS0
-    chmod 0660 /dev/ttyHS0
+    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
-    chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
-# LGE_CHANGE_E [2011.11.06] M3S : changhwan.roe@lge.com init.m3s.rc [END]
+    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
+
+    # turn off bluetooth at startup
+    write /sys/class/rfkill/rfkill0/state 0
+    
 #LGE_CHANGE_S for Slate_ADB
     mkdir /data/img 0770 shell shell
 #LGE_CHANGE_S    
@@ -58,11 +61,6 @@ on boot
 
     # Disable keypad (except Power key) during "suspend2ram" state
     chown system system /sys/bus/platform/devices/pm8058-keypad/disable_kp
-
-    # 7630 target supports Warmboot capability
-	# 20111128 suhyun.lee@lge.com FRAMEWORK disable warmboot [START]
-    # setprop ro.warmboot.capability 1
-	# 20111128 suhyun.lee@lge.com FRAMEWORK disable warmboot [END]
 
 # LGE_CHANGE_S [2011.07.25] M3S : chmod sysfs file permission [START]
 	chown system system /sys/module/lge_emmc_direct_access/parameters/write_block
@@ -105,18 +103,9 @@ on boot
 # 20111108 kyungyoul.lee@lge.com FRAMEWORK M3S - add last_kmsg Backup for setting app
     exec /system/bin/sh /system/etc/last_kmsg_backup.sh 
 
-# 20111028 kyungyoul.lee@lge.com FRAMEWORK M3S - do not change permission due to CTS Failure   
-#	chmod 0777 /dev/block/mmcblk0
-# LGE_CHANGE_E [2011.07.25] M3S : chmod sysfs file permission [END]
-
 ### LGE_CHANGE_S SENSOR FIRMWARE UPDATE (jongkwon.chae@lge.com)
 ## LGE_CHANGE_S, M3-SENSOR [jihyun.seong@lge.com] 2011-07-04
 # Ecompass sensor
-#	mkdir /data/akmd 0777 system system
-#	chown system system /dev/akm8975_dev
-#	chmod 0666 /dev/akm8975_dev
-#	chown system system /dev/akm8975_aot
-#	chmod 0666 /dev/akm8975_aot
 	chown system system /dev/alps_io
 	chmod 0660 /dev/alps_io
 	chown system system /sys/bus/platform/devices/alps/calibration
@@ -124,10 +113,6 @@ on boot
 	chown system system /dev/bma222
 	chmod 0660 /dev/bma222
 # Proxi sensor
-# M3-MPCS
-#  chmod 0666 /sys/bus/i2c/drivers/proximity_gp2ap/3-0044/enable  
-# M3-EU
-#  chmod 0666 /sys/bus/i2c/drivers/proximity_gp2ap/5-0044/enable
 	chown system system /sys/bus/i2c/drivers/proximity_gp2ap/9-0044/enable
 	chmod 0660 /sys/bus/i2c/drivers/proximity_gp2ap/9-0044/enable
 	chown system system /sys/bus/i2c/drivers/proximity_gp2ap/10-0044/enable
@@ -145,35 +130,7 @@ on boot
 
 # Enable Bluetooth 802.11 PAL when Bluetooth is turned on
     setprop ro.config.bt.amp no
-    
-on property:init.svc.bluetoothd=running
-    start btwlancoex
-    start amp_load
-    # +s QCT_BT_PATCH_QCT109806 suhui.kim@lge.com 111207
-    write /sys/class/bluetooth/hci0/idle_timeout 7000
-    # +e QCT_BT_PATCH_QCT109806
 
-on property:init.svc.bluetoothd=stopped
-    start amp_unload
-    stop btwlancoex
-    
-# LGE_CHANGE_S [2011.11.06] M3S : changhwan.roe@lge.com init.m3s.rc [START]
-#service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
-service hciattach /system/bin/logwrapper /system/bin/sh /system/etc/init.qcom.bt.sh
-    user bluetooth
-    group qcom_oncrpc bluetooth net_bt_admin
-    disabled
-    oneshot
-
-# Temporary used 2011.10.18 changhwan.roe@lge.com : might be moved to init.m3s.rc
-# LGE_CHANGE_S [2011.10.17] M3S : changhwan.roe@lge.com bluetooth from m3
-# +s LG_BTUI_ATCMD_DUTMODE munho2.lee@lge.com 110902, using QCT BT solution
-service hciattach_dut /system/bin/logwrapper /system/bin/hciattach -n /dev/ttyHS0 qualcomm-ibs 3000000
-    user bluetooth
-    group qcom_oncrpc bluetooth net_bt_admin
-    disabled
-# +e LG_BTUI_ATCMD_DUTMODE
-# LGE_CHANGE_E [2011.10.17] M3S : changhwan.roe@lge.com bluetooth from m3
 
 # LGE_CHANGE_S [2011.11.06] M3S : changhwan.roe@lge.com init.m3s.rc [START]
 on property:bt.hci_smd.driver.load=1
@@ -181,18 +138,6 @@ on property:bt.hci_smd.driver.load=1
 
 on property:bt.hci_smd.driver.load=0
     exec /system/bin/rmmod hci_smd.ko
-
-# suhui.kim@lge.com, disabled BT DUN for M3
-#service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
-#    disabled
-#    oneshot
-
-# suhui.kim@lge.com, disabled BT DUN for M3
-#service dund /system/bin/sdptool add --channel=1 DUN
-#    user bluetooth
-#    group bluetooth net_bt_admin
-#    disabled
-#    oneshot
 
 # LGE_CHANGE_S [2011.08.10] M3S : changhwan.roe@lge.com bluetooth from m3 [START]
 service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh
@@ -202,21 +147,6 @@ service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh
     oneshot
 # LGE_CHANGE_E [2011.08.10] M3S : changhwan.roe@lge.com bluetooth from m3 [END]
 
-# LGE_CHANGE_S [2011.08.10] M3S : changhwan.roe@lge.com bluetooth from m3 [START]
-service ftp /system/bin/sdptool add --psm=5257 --channel=20 FTP
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service map /system/bin/sdptool add --channel=16 MAS
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-# LGE_CHANGE_E [2011.08.10] M3S : changhwan.roe@lge.com bluetooth from m3 [END]
-# LGE_CHANGE_E [2011.11.06] M3S : changhwan.roe@lge.com init.m3s.rc [END]
-
 on property:hw.keyboard.disable=1
     write  /sys/bus/platform/devices/pm8058-keypad/disable_kp 1
 
@@ -225,11 +155,6 @@ service qcom-wifi /system/bin/sh /system/etc/init.qcom.wifi.sh
     oneshot
 # 2011-08-15, dongseok.ok@lge.com, Wi-Fi configuration [END]
 
-### LGE_CHANGE_S SENSOR FIRMWARE UPDATE (jongkwon.chae@lge.com)
-## LGE_CHANGE_S, M3-SENSOR [jihyun.seong@lge.com] 2011-07-04
-#service akmd8975 /system/bin/akmd8975 -m 7
-#	user compass
-#	group system
 service sensors /system/bin/sensors.qcom
     user root
     group root

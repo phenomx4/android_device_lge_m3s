@@ -3,8 +3,7 @@
 #
 # system.prop for surf
 #
-ro.telephony.ril_class=LGEQualcommRIL
-ro.telephony.no_icc=true
+ro.telephony.ril_class=QualcommSharedRIL
 ro.ril.disable.power.collapse=0
 ro.telephony.ril.v3=signalstrength,datacall,singlepdp,datacallapn
 ro.ril.def.preferred.network=4
@@ -22,6 +21,7 @@ persist.rild.nitz_short_ons_1=
 persist.rild.nitz_short_ons_2=
 persist.rild.nitz_short_ons_3=
 ril.subscription.types=NV
+DEVICE_PROVISIONED=1
 dev.pm.dyn_samplingrate=1
 
 #
@@ -96,6 +96,8 @@ ro.telephony.gsm.spn.shortname=true
 
 ro.cdma.voicemail.number=mine
 
+#persist.service.diag.enable=1
+
 # hyoill.leem 2012.01.16 usb port enable/disable
 persist.service.usbport.enable=1
 # hyoill.leem 2012.01.16 usb port enable/disable
@@ -132,6 +134,7 @@ debug.nfc.fw_boot_download=false
 debug.nfc.se=true
 ro.nfc.port=I2C 
 
+persist.service.adb.enable=1
 service.adb.root=1
 ro.additionalmounts=/storage/sdcard1
 ro.vold.switchablepair=/storage/sdcard0,/storage/sdcard1
@@ -146,7 +149,7 @@ debug.performance.tuning=1
 video.accelerate.hw=1
 debug.egl.profiler=1
 debug.egl.hw=1
-persist.sys.ui.hw=1
+persist.sys.ui.hw=true
 
 dalvik.vm.checkjni=0
 dalvik.vm.dexopt-data-only=1
@@ -163,5 +166,14 @@ wifi.ap.interface=wlan0
 persist.sys.usbcharger.enable=1
 
 persist.sys.purgeable_assets=1
+
+ro.bt.bdaddr_path=/data/misc/bluedroid/bdaddr
+
+# Hardware Info
+ro.device.chipset=Qualcomm Snapdragon MSM8655
+ro.device.gpu=Adreno 205
+ro.device.front_cam=None
+ro.device.rear_cam=(S5K4E1) 5 Megapixels
+ro.device.screen_res=320x480
 
 ################ end system.prop

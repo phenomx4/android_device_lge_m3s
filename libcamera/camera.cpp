@@ -64,6 +64,7 @@ static int camera_device_open(const hw_module_t* module, const char* name,
 static int camera_device_close(hw_device_t* device);
 static int camera_get_number_of_cameras(void);
 static int camera_get_camera_info(int camera_id, struct camera_info *info);
+int camera_get_number_of_cameras(void);
 
 static struct hw_module_methods_t camera_module_methods = {
         open: camera_device_open
@@ -72,8 +73,8 @@ static struct hw_module_methods_t camera_module_methods = {
 camera_module_t HAL_MODULE_INFO_SYM = {
     common: {
          tag: HARDWARE_MODULE_TAG,
-         version_major: 1,
-         version_minor: 0,
+        module_api_version: CAMERA_DEVICE_API_VERSION_1_0,
+        hal_api_version: 0,
          id: CAMERA_HARDWARE_MODULE_ID,
          name: "msm7x30 CameraHal Module",
          author: "Zhibin Wu",
@@ -96,6 +97,7 @@ typedef struct priv_camera_device {
     camera_data_timestamp_callback data_timestamp_callback;
     camera_request_memory request_memory;
     void *user;
+    int preview_started;
     /* old world*/
     int preview_width;
     int preview_height;
@@ -175,6 +177,7 @@ static void wrap_queue_buffer_hook(void *data, void* buffer)
         return;
 
     dev = (priv_camera_device_t*) data;
+
     window = dev->window;
 
     //QiSS ME fix video preview crash
@@ -409,7 +412,7 @@ static void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
  * implementation of priv_camera_device_ops functions
  *******************************************************************/
 
-void CameraHAL_FixupParams(android::CameraParameters &camParams)
+void CameraHAL_FixupParams(android::CameraParameters &camParams, priv_camera_device_t* dev)
 {
     const char *supported_iso_modes = "auto,ISO100,ISO200,ISO400,ISO800";
     const char *preview_sizes = "640x480,576x432,480x320,384x288,352x288,320x240,240x160,176x144";
@@ -425,12 +428,26 @@ void CameraHAL_FixupParams(android::CameraParameters &camParams)
     camParams.set("touchAfAec-dy","100");
     camParams.set(CameraParameters::KEY_MAX_NUM_FOCUS_AREAS, "1");
     camParams.set(CameraParameters::KEY_MAX_NUM_METERING_AREAS, "1");
-        
+
+    camParams.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT,
+                 CameraParameters::PIXEL_FORMAT_YUV420SP);
     
-    camParams.set(CameraParameters::KEY_ISO_MODE,
-                 CameraParameters::ISO_AUTO);
-    
-    camParams.set(CameraParameters::KEY_SUPPORTED_ISO_MODES, supported_iso_modes);
+   if (!camParams.get(CameraParameters::KEY_SUPPORTED_VIDEO_SIZES)) {
+      camParams.set(CameraParameters::KEY_SUPPORTED_VIDEO_SIZES,
+                   video_sizes);
+   }   
+   
+   if (!camParams.get(CameraParameters::KEY_VIDEO_SIZE)) {
+      camParams.set("record-size", preferred_size);
+      camParams.set(CameraParameters::KEY_VIDEO_SIZE, preferred_size);
+   } else {
+      camParams.set("record-size", camParams.get(CameraParameters::KEY_VIDEO_SIZE));
+   }  
+   
+   if (!camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO)) {
+      camParams.set(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
+                   preferred_size);
+   }
 }
 
 int camera_set_preview_window(struct camera_device * device,
@@ -452,6 +469,7 @@ int camera_set_preview_window(struct camera_device * device,
 
     if (!window) {
         ALOGI("%s---: window is NULL", __FUNCTION__);
+        gCameraHals[dev->cameraid]->setOverlay(NULL);
         return 0;
     }
 
@@ -498,7 +516,7 @@ int camera_set_preview_window(struct camera_device * device,
     //    return -1;
     //}
 
-    window->set_usage(window, GRALLOC_USAGE_PMEM_PRIVATE_ADSP | GRALLOC_USAGE_SW_READ_OFTEN);
+    window->set_usage(window, GRALLOC_USAGE_PMEM_PRIVATE_ADSP | GRALLOC_USAGE_HW_RENDER);
 
     if (window->set_buffers_geometry(window, preview_width,
                                      preview_height, hal_pixel_format)) {
@@ -626,6 +644,10 @@ int camera_start_preview(struct camera_device * device)
     rv = gCameraHals[dev->cameraid]->startPreview();
 
     ALOGI("%s--- rv %d", __FUNCTION__,rv);
+
+    if(!rv)
+      dev->preview_started = 1;
+
     return rv;
 }
 
@@ -639,6 +661,7 @@ void camera_stop_preview(struct camera_device * device)
         return;
 
     dev = (priv_camera_device_t*) device;
+    dev->preview_started = 0;
 
     gCameraHals[dev->cameraid]->stopPreview();
     ALOGI("%s---", __FUNCTION__);
@@ -657,6 +680,7 @@ int camera_preview_enabled(struct camera_device * device)
     dev = (priv_camera_device_t*) device;
 
     rv = gCameraHals[dev->cameraid]->previewEnabled();
+    return dev->preview_started;
 
     ALOGI("%s--- rv %d", __FUNCTION__,rv);
 
@@ -884,7 +908,7 @@ char* camera_get_parameters(struct camera_device * device)
     camParams.dump();
 #endif
 
-    CameraHAL_FixupParams(camParams);
+    CameraHAL_FixupParams(camParams, dev);
 
 #ifdef HTC_FFC
     if (dev->cameraid == 1) {
@@ -946,6 +970,7 @@ void camera_release(struct camera_device * device)
         return;
 
     dev = (priv_camera_device_t*) device;
+    dev->preview_started = 0;
 
     gCameraHals[dev->cameraid]->release();
     ALOGI("%s---", __FUNCTION__);
@@ -985,6 +1010,7 @@ int camera_device_close(hw_device_t* device)
     dev = (priv_camera_device_t*) device;
 
     if (dev) {
+        dev->preview_started = 0;
         gCameraHals[dev->cameraid].clear();
         gCameraHals[dev->cameraid] = NULL;
         gCamerasOpen--;
@@ -1042,7 +1068,8 @@ int camera_device_open(const hw_module_t* module, const char* name,
 
     if (name != NULL) {
         cameraid = atoi(name);
-        num_cameras = HAL_getNumberOfCameras();
+
+        num_cameras = camera_get_number_of_cameras();
 
         if(cameraid > num_cameras)
         {

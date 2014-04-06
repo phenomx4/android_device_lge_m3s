@@ -18,8 +18,37 @@
 -->
 
 <!-- These resources are around just to allow their values to be customized
-     for different hardware and product builds. -->
+     for different hardware and product builds.  Do not translate. -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Do not translate. Defines the slots for the right-hand side icons.  That is to say, the
+         icons in the status bar that are not notifications. -->
+    <string-array name="config_statusBarIcons">
+       <item><xliff:g id="id">ime</xliff:g></item>
+       <item><xliff:g id="id">sync_failing</xliff:g></item>
+       <item><xliff:g id="id">sync_active</xliff:g></item>
+       <item><xliff:g id="id">gps</xliff:g></item>
+       <item><xliff:g id="id">bluetooth</xliff:g></item>
+       <item><xliff:g id="id">nfc</xliff:g></item>
+       <item><xliff:g id="id">tty</xliff:g></item>
+       <item><xliff:g id="id">speakerphone</xliff:g></item>
+       <item><xliff:g id="id">mute</xliff:g></item>
+       <item><xliff:g id="id">volume</xliff:g></item>
+       <item><xliff:g id="id">wifi</xliff:g></item>
+       <item><xliff:g id="id">cdma_eri</xliff:g></item>
+       <item><xliff:g id="id">data_connection</xliff:g></item>
+       <item><xliff:g id="id">phone_evdo_signal</xliff:g></item>
+       <item><xliff:g id="id">phone_signal</xliff:g></item>
+       <item><xliff:g id="id">battery</xliff:g></item>
+       <item><xliff:g id="id">alarm_clock</xliff:g></item>
+       <item><xliff:g id="id">secure</xliff:g></item>
+       <item><xliff:g id="id">clock</xliff:g></item>
+    </string-array>
+
+    <!-- Flag indicating whether the surface flinger has limited
+         alpha compositing functionality in hardware.  If set, the window
+         manager will disable alpha trasformation in animations where not
+         strictly needed. -->
+    <bool name="config_sf_limitedAlpha">false</bool>
 
     <bool name="config_animateScreenLights">false</bool>
 
@@ -30,34 +59,52 @@
     <item>"rndis0"</item>
     </string-array>
 
-    <!-- Array of ConnectivityManager.TYPE_xxxx values allowable for tethering -->
-    <!-- Common options are [1, 4] for TYPE_WIFI and TYPE_MOBILE_DUN or
-                      <!== [0,1,5,7] for TYPE_MOBILE, TYPE_WIFI, TYPE_MOBILE_HIPRI and TYPE_BLUETOOTH -->
-    <integer-array translatable="false" name="config_tether_upstream_types">
-        <item>0</item>
-        <item>1</item>
-        <item>5</item>
-        <item>7</item>
+    <!-- Array of ConnectivityManager.TYPE_xxxx constants for networks that may only
+         be controlled by systemOrSignature apps.  -->
+    <integer-array translatable="false" name="config_protectedNetworks">
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
     </integer-array>
+
+    <!-- This string array should be overridden by the device to present a list of radio
+         attributes.  This is used by the connectivity manager to decide which networks can coexist
+         based on the hardware -->
+    <!-- An Array of "[ConnectivityManager connectionType],
+                      [# simultaneous connection types]"  -->
+    <string-array translatable="false" name="radioAttributes">
+        <item>"1,1"</item>
+        <item>"0,1"</item>
+        <item>"7,1"</item>
+    </string-array>
+
+    <!-- Set of NetworkInfo.getType() that reflect data usage. -->
+    <integer-array translatable="false" name="config_data_usage_network_types">
+        <item>0</item> <!-- TYPE_MOBILE -->
+        <item>2</item> <!-- TYPE_MOBILE_MMS -->
+        <item>3</item> <!-- TYPE_MOBILE_SUPL -->
+        <item>4</item> <!-- TYPE_MOBILE_DUN -->
+        <item>5</item> <!-- TYPE_MOBILE_HIPRI -->
+        <item>10</item> <!-- TYPE_MOBILE_FOTA -->
+        <item>11</item> <!-- TYPE_MOBILE_IMS -->
+        <item>12</item> <!-- TYPE_MOBILE_CBS -->
+    </integer-array>
+
+    <!-- The maximum duration (in milliseconds) we expect a network transition to take -->
+    <integer name="config_networkTransitionTimeout">60000</integer>
 
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
          USB interfaces.  If the device doesn't want to support tething over USB this should
          be empty.  An example would be "usb.*" -->
     <string-array translatable="false" name="config_tether_usb_regexs">
-	<item>"usb\\d"</item>
+	<item>"usb0"</item>
     </string-array>
 
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
          Wifi interfaces.  If the device doesn't want to support tethering over Wifi this
          should be empty.  An example would be "softap.*" -->
     <string-array translatable="false" name="config_tether_wifi_regexs">
-	<item>"softap.*"</item>
-    </string-array>
-
-    <!-- List of regexpressions describing the interface (if any) that represent tetherable
-         WiMAX interfaces.  If the device doesn't want to support tethering over Wifi this
-         should be empty.  An example would be "softap.*" -->
-    <string-array translatable="false" name="config_tether_wimax_regexs">
+	<item>"wlan0"</item>
     </string-array>
 
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
@@ -133,6 +180,8 @@
          note that empty fields can be ommitted: "name,apn,,,,,,,,,310,260,,DUN" -->
     <string translatable="false" name="config_tether_apndata"></string>
 
+    <!-- Boolean indicating whether the wifi chipset has dual frequency band support -->
+    <bool translatable="false" name="config_wifi_dual_band_support">false</bool>
 
     <!-- An Array of "[Connection name],[ConnectivityManager.TYPE_xxxx],
                   [associated radio-type],[priority],[restoral-timer(ms)],[dependencyMet]  -->
@@ -165,13 +214,6 @@
     <string name="default_wallpaper_component">com.android.phasebeam/.PhaseBeamWallpaper</string>
 
     <bool name="config_disableMenuKeyInLockScreen">false</bool>
-
-    <!-- Menu+Home+Back -->
-    <integer name="config_deviceHardwareKeys">7</integer>
-
-    <!-- Boolean indicating if current platform supports quick switch-on/off of
-                           Bluetooth Module -->
-    <bool name="config_bluetooth_adapter_quick_switch">false</bool>
 
     <!-- Vibrator pattern for feedback about a long screen/key press -->
     <integer-array name="config_longPressVibePattern">
@@ -239,4 +281,15 @@ icons in the status bar that are not notifications. -->
        <item><xliff:g id="id">clock</xliff:g></item>
     </string-array>
 
+    <!-- Timeout in MS for how long you have to long-press the back key to
+         kill the foreground app. -->
+    <integer name="config_backKillTimeout">2000</integer>
+    
+        <!-- empty string to disable, or like: /sys/kernel/fast_charge/force_fast_charge
+         it is disabled by default so devices need to add an overlay to enable-->
+    <string name="config_fastChargePath" translatable="false">/sys/kernel/fast_charge/force_fast_charge</string>
+    
+        <!-- Boolean indicating whether Softap requires reloading AP firmware -->
+    <bool name="config_wifiApFirmwareReload">false</bool>
+    
 </resources>

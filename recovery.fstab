@@ -8,10 +8,10 @@
 /recovery	emmc		/dev/block/mmcblk0p14
 
 # internal sd card is emmc
-/emmc		vfat		/dev/block/mmcblk0p15	/dev/block/mmcblk0
+/emmc		vfat		/dev/block/mmcblk0p15	/dev/block/mmcblk0 length=-16384
 
 # external sd card, first partition
-/sdcard		vfat		/dev/block/mmcblk1p1	/dev/block/mmcblk1
+/sdcard		vfat		/dev/block/mmcblk1p1	/dev/block/mmcblk1 length=-16384
 
 # external sd card, second partition as ext4
 #/sd-ext     	ext4		/dev/block/mmcblk1p2
